@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  
+  db:
+    env_file: .env
+    image: postgres
+    container_name: db_user
+    environment:
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - .:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+  api:
+    build: 
+      context: .
+    container_name: django_service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+    depends_on:
+      - db
+    command: python parta/manage.py runserver 0.0.0.0:8000
